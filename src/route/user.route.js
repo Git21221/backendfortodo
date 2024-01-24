@@ -1,5 +1,4 @@
 import { Router } from "express";
-import cors from "cors";
 import {
   addTodo,
   alltodos,
@@ -15,21 +14,15 @@ import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
-router.route("/register").post(cors(), registerUser);
-router.route("/login").post(cors(), loginUser);
-router.route("/getCurrentuser").get(cors(), verifyJWT, getCurrentUser);
-router.route("/addTodo").post(cors(), verifyJWT, addTodo);
-router.route("/alltodos").get(cors(), verifyJWT, alltodos);
-router.route("/editProfile").post(
-  cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-  }),
-  upload.single("avatar"),
-  verifyJWT,
-  editProfile
-);
-router.route("/deleteProfile").get(cors(), verifyJWT, deleteProfile);
-router.route("/logout").get(cors(), verifyJWT, logout);
+router.route("/register").post(registerUser);
+router.route("/login").post(loginUser);
+router.route("/getCurrentuser").get(verifyJWT, getCurrentUser);
+router.route("/addTodo").post(verifyJWT, addTodo);
+router.route("/alltodos").get(verifyJWT, alltodos);
+router
+  .route("/editProfile")
+  .post(upload.single("avatar"), verifyJWT, editProfile);
+router.route("/deleteProfile").get(verifyJWT, deleteProfile);
+router.route("/logout").get(verifyJWT, logout);
 
 export default router;

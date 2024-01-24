@@ -1,5 +1,5 @@
 import express from "express";
-import 'dotenv/config'
+import "dotenv/config";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
@@ -8,12 +8,7 @@ const app = express();
 
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true
-  })
-);
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
