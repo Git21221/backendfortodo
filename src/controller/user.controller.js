@@ -9,7 +9,7 @@ const options = {
   maxAge: 30000000,
   httpOnly: false,
   secure: true,
-  sameSite: "Lax",
+  sameSite: "",
   path: "/",
 };
 
@@ -88,8 +88,8 @@ const loginUser = asyncHandler(async (req, res) => {
   );
 
   try {
-    res.cookie("accessToken", accessToken, options);
-    res.cookie("refreshToken", refreshToken, options);
+    res.cookie("accessToken", accessToken);
+    res.cookie("refreshToken", refreshToken);
   } catch (error) {
     console.log(error.message);
   }
