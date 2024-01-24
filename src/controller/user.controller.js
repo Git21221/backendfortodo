@@ -7,9 +7,9 @@ import { uploadOnCloudianry } from "../utils/cloudinary.js";
 
 const options = {
   maxAge: 24 * 60 * 60 * 1000,
-  httpOnly: true,
+  httpOnly: false,
   secure: true,
-  sameSite: "None",
+  sameSite: "Secure",
   path: "/",
   domain: 'https://backendfortodo-production.up.railway.app/'
 };
