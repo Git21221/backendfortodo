@@ -7,9 +7,9 @@ import { uploadOnCloudianry } from "../utils/cloudinary.js";
 
 const options = {
   maxAge: 24 * 60 * 60 * 1000,
-  httpOnly: false,
+  httpOnly: true,
   secure: true,
-  sameSite: "Lax",
+  sameSite: "Strict",
   path: "/",
 };
 
