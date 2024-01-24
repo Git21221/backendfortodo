@@ -20,9 +20,15 @@ router.route("/login").post(cors(), loginUser);
 router.route("/getCurrentuser").get(cors(), verifyJWT, getCurrentUser);
 router.route("/addTodo").post(cors(), verifyJWT, addTodo);
 router.route("/alltodos").get(cors(), verifyJWT, alltodos);
-router
-  .route("/editProfile")
-  .post(cors(), upload.single("avatar"), verifyJWT, editProfile);
+router.route("/editProfile").post(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+  }),
+  upload.single("avatar"),
+  verifyJWT,
+  editProfile
+);
 router.route("/deleteProfile").get(cors(), verifyJWT, deleteProfile);
 router.route("/logout").get(cors(), verifyJWT, logout);
 
