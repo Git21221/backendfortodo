@@ -6,10 +6,10 @@ import { Todo } from "../model/todo.model.js";
 import { uploadOnCloudianry } from "../utils/cloudinary.js";
 
 const options = {
-  maxAge: 30000000,
+  maxAge: 24 * 60 * 60 * 1000,
   httpOnly: false,
   secure: true,
-  sameSite: "",
+  sameSite: "Lax",
   path: "/",
 };
 
