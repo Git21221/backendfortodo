@@ -89,8 +89,8 @@ const loginUser = asyncHandler(async (req, res) => {
   );
 
   try {
-    res.cookie("accessToken", accessToken);
-    res.cookie("refreshToken", refreshToken);
+    res.cookie("accessToken", accessToken, options);
+    res.cookie("refreshToken", refreshToken, options);
   } catch (error) {
     console.log(error.message);
   }
