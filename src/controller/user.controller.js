@@ -9,8 +9,9 @@ const options = {
   maxAge: 24 * 60 * 60 * 1000,
   httpOnly: true,
   secure: true,
-  sameSite: "Strict",
+  sameSite: "None",
   path: "/",
+  domain: 'https://backendfortodo-production.up.railway.app/'
 };
 
 const generateAccessAndRefreshToken = async (userid) => {
