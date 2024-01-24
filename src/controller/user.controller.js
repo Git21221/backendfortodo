@@ -9,7 +9,7 @@ const options = {
   maxAge: 24 * 60 * 60 * 1000,
   httpOnly: false,
   secure: true,
-  sameSite: "",
+  sameSite: "None",
   path: "/",
 };
 
