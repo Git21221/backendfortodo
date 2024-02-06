@@ -4,9 +4,11 @@ import {
   alltodos,
   deleteProfile,
   editProfile,
+  editTodo,
   getCurrentUser,
   loginUser,
   logout,
+  refreshAccessToken,
   registerUser,
 } from "../controller/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -24,5 +26,7 @@ router
   .post(upload.single("avatar"), verifyJWT, editProfile);
 router.route("/deleteProfile").get(verifyJWT, deleteProfile);
 router.route("/logout").get(verifyJWT, logout);
+router.route("/editTodo").post(verifyJWT, editTodo);
+router.route("/refresh").get(refreshAccessToken);
 
 export default router;

@@ -4,6 +4,7 @@ import { apiResponse } from "../utils/apiResponse.js";
 import { User } from "../model/user.model.js";
 import { Todo } from "../model/todo.model.js";
 import { uploadOnCloudianry } from "../utils/cloudinary.js";
+import jwt from "jsonwebtoken";
 
 const options = {
   maxAge: 24 * 60 * 60 * 1000,
@@ -20,6 +21,8 @@ const generateAccessAndRefreshToken = async (userid) => {
     const accessToken = await user.generateAccessToken();
     const refreshToken = await user.generateRefreshToken();
 
+    if(!accessToken || !refreshToken) throw new apiError(400, "Error in rerfresh or access Token");
+
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
     return { accessToken, refreshToken };
@@ -30,6 +33,48 @@ const generateAccessAndRefreshToken = async (userid) => {
     );
   }
 };
+
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  try {
+    const incomingRefreshToken = req?.cookies?.refreshToken;
+
+    if (!incomingRefreshToken) throw new apiError(401, "Invalid refresh Token");
+
+    console.log(incomingRefreshToken);
+
+    const decodedToken = jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+
+    console.log(decodedToken);
+
+    if (!decodedToken) throw new apiError(401, "failed to decode refreshToken");
+
+    const userid = decodedToken._id;
+    const user = await User.findById(userid);
+
+    if (!user) throw new apiError(400, "user not found with that refreshToken");
+
+    console.log(user);
+
+    if (incomingRefreshToken !== user.refreshToken)
+      throw new apiError(400, "RefreshToken doesn't match with user");
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+      user._id
+    );
+    console.log(accessToken, refreshToken);
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
+      .json(new apiResponse(200, "Access token refreshed", user));
+  } catch (error) {
+    throw new apiError(400, error?.message || "Invalid refreshToken");
+  }
+});
 
 const registerUser = asyncHandler(async (req, res) => {
   const { fullName, email, password, username } = req.body;
@@ -55,8 +100,6 @@ const registerUser = asyncHandler(async (req, res) => {
     username,
     password,
   });
-
-  console.log(user);
 
   return res
     .status(200)
@@ -93,7 +136,6 @@ const loginUser = asyncHandler(async (req, res) => {
   } catch (error) {
     console.log(error.message);
   }
-  console.log(loggedinUser);
 
   return res
     .status(200)
@@ -118,7 +160,7 @@ const addTodo = asyncHandler(async (req, res) => {
 
   await createdtodo.save();
 
-  const userid = req.user.id;
+  const userid = req.user._id;
 
   const user = await User.findById(userid);
 
@@ -151,14 +193,6 @@ const editProfile = asyncHandler(async (req, res) => {
     updatedMonth,
     updatedYear,
   } = req.body;
-  console.log(
-    updatedName,
-    updatedEmail,
-    updatedDate,
-    updatedMonth,
-    updatedYear,
-    updatedGender
-  );
 
   if (updatedEmail === "") updatedEmail = req.user.email;
   if (updatedName === "") updatedName = req.user.fullName;
@@ -175,7 +209,7 @@ const editProfile = asyncHandler(async (req, res) => {
     avatarImage = await uploadOnCloudianry(avatarLocalPath);
 
   const userid = req.user?._id;
-  console.log(updatedGender);
+
   const updatedInfo = await User.findByIdAndUpdate(
     userid,
     {
@@ -203,9 +237,9 @@ const editProfile = asyncHandler(async (req, res) => {
 const deleteProfile = asyncHandler(async (req, res) => {
   const result = await User.deleteOne(req.user._id);
   // if (result.deletedCount === 1)
-    return res
-      .status(200)
-      .json(new apiResponse(200, "User deleted successfully", result));
+  return res
+    .status(200)
+    .json(new apiResponse(200, "User deleted successfully", result));
 });
 
 const logout = asyncHandler(async (req, res) => {
@@ -225,6 +259,30 @@ const logout = asyncHandler(async (req, res) => {
   return res.status(200).json(new apiResponse(200, "User loggedout", {}));
 });
 
+const editTodo = asyncHandler(async (req, res) => {
+  const { todoid, todoname, tododesc } = req.body;
+
+  const deletedTodo = await Todo.deleteOne({ _id: todoid });
+  console.log(deletedTodo);
+
+  const updatedTodo = await Todo.create({
+    todoName: todoname,
+    todoDesc: tododesc,
+  });
+
+  await updatedTodo.save();
+
+  const user = await User.findById(req.user._id);
+
+  user.todos.push(updatedTodo);
+
+  await user.save();
+
+  console.log(req.body);
+
+  return res.status(200).json(new apiResponse(200, "todo updated", user));
+});
+
 export {
   registerUser,
   loginUser,
@@ -233,5 +291,7 @@ export {
   alltodos,
   editProfile,
   deleteProfile,
-  logout
+  logout,
+  editTodo,
+  refreshAccessToken,
 };
