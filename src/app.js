@@ -8,7 +8,12 @@ const app = express();
 
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(cors({ origin: 'https://backendfortodo-production.up.railway.app', credentials: true }));
+app.use(
+  cors({
+    origin: "https://frontendfortodo-saikat-das-projects.vercel.app",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
