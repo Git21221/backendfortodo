@@ -17,9 +17,12 @@ const options = {
 const generateAccessAndRefreshToken = async (userid) => {
   try {
     const user = await User.findById(userid);
+    console.log(user);
 
-    const accessToken = await user.generateAccessToken();
-    const refreshToken = await user.generateRefreshToken();
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+
+    console.log(accessToken, refreshToken);
 
     if(!accessToken || !refreshToken) throw new apiError(400, "Error in rerfresh or access Token");
 
