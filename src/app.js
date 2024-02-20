@@ -10,7 +10,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: "https://frontendfortodo-saikat-das-projects.vercel.app",
+    origin: process.env.CORS_ORIGIN,
     credentials: true,
   })
 );
