@@ -24,7 +24,8 @@ const generateAccessAndRefreshToken = async (userid) => {
 
     console.log(accessToken, refreshToken);
 
-    if(!accessToken || !refreshToken) throw new apiError(400, "Error in rerfresh or access Token");
+    if (!accessToken || !refreshToken)
+      throw new apiError(400, "Error in rerfresh or access Token");
 
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
@@ -68,7 +69,6 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       user._id
     );
     console.log(accessToken, refreshToken);
-
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
@@ -176,13 +176,15 @@ const addTodo = asyncHandler(async (req, res) => {
 });
 
 const alltodos = asyncHandler(async (req, res) => {
-  const userid = req.user.id;
+  const userid = req.user._id;
 
-  const user = await User.findById(userid);
-
-  if (!user) throw new apiError(401, "user not found");
-
-  const todos = user.todos;
+  const todos = await Todo.aggregate([
+    {
+      $match: {
+        owner: userid,
+      },
+    },
+  ]);
 
   return res.status(200).json(new apiResponse(200, "todos are here", todos));
 });
@@ -265,25 +267,12 @@ const logout = asyncHandler(async (req, res) => {
 const editTodo = asyncHandler(async (req, res) => {
   const { todoid, todoname, tododesc } = req.body;
 
-  const deletedTodo = await Todo.deleteOne({ _id: todoid });
-  console.log(deletedTodo);
-
-  const updatedTodo = await Todo.create({
+  await Todo.findById(todoid).updateOne({
     todoName: todoname,
     todoDesc: tododesc,
   });
 
-  await updatedTodo.save();
-
-  const user = await User.findById(req.user._id);
-
-  user.todos.push(updatedTodo);
-
-  await user.save();
-
-  console.log(req.body);
-
-  return res.status(200).json(new apiResponse(200, "todo updated", user));
+  return res.status(200).json(new apiResponse(200, "todo updated"));
 });
 
 export {
