@@ -14,6 +14,10 @@ const options = {
   path: "/",
 };
 
+const homepage = () => {
+  res.status(200).json("Hii");
+}
+
 const generateAccessAndRefreshToken = async (userid) => {
   try {
     const user = await User.findById(userid);
@@ -275,4 +279,5 @@ export {
   logout,
   editTodo,
   refreshAccessToken,
+  homepage
 };
