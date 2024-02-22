@@ -6,15 +6,22 @@ import { Todo } from "../model/todo.model.js";
 import { uploadOnCloudianry } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 
-const options = {
-  maxAge: 60 * 1000,
+const accoptions = {
+  maxAge: 24 * 60 * 60 * 1000,
+  httpOnly: false,
+  secure: true,
+  sameSite: "None",
+  path: "/",
+};
+const refoptions = {
+  maxAge: 30 * 24 * 60 * 60 * 1000,
   httpOnly: false,
   secure: true,
   sameSite: "None",
   path: "/",
 };
 
-const homepage = () => {
+const homepage = (req, res) => {
   res.status(200).json("Hii");
 }
 
@@ -75,8 +82,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     console.log(accessToken, refreshToken);
     return res
       .status(200)
-      .cookie("accessToken", accessToken, options)
-      .cookie("refreshToken", refreshToken, options)
+      .cookie("accessToken", accessToken, accoptions)
+      .cookie("refreshToken", refreshToken, refoptions)
       .json(new apiResponse(200, "Access token refreshed", user));
   } catch (error) {
     throw new apiError(400, error?.message || "Invalid refreshToken");
@@ -138,8 +145,8 @@ const loginUser = asyncHandler(async (req, res) => {
   );
 
   try {
-    res.cookie("accessToken", accessToken, options);
-    res.cookie("refreshToken", refreshToken, options);
+    res.cookie("accessToken", accessToken, accoptions);
+    res.cookie("refreshToken", refreshToken, refoptions);
   } catch (error) {
     console.log(error.message);
   }
@@ -252,8 +259,8 @@ const logout = asyncHandler(async (req, res) => {
       new: true,
     }
   );
-  res.clearCookie("accessToken", options);
-  // res.clearCookie("refreshToken", options);
+  res.clearCookie("accessToken", accoptions);
+  res.clearCookie("refreshToken", refoptions);
   return res.status(200).json(new apiResponse(200, "User loggedout", {}));
 });
 
