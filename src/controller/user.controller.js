@@ -10,17 +10,17 @@ const accessTokenOptions = {
   maxAge: 24 * 60 * 60 * 1000, // 1 day validity
   httpOnly: true,
   secure: true,
-  origin: process.env.CORS_ORIGIN,
-  path: "/",
-  sameSite: 'None'
+  domain: 'localhost',
+  sameSite: 'None',
+  path: '/'
 };
 const refreshTokenOptions = {
   maxAge: 6 * 30 * 24 * 60 * 60 * 1000, //6 months validity
   httpOnly: true,
   secure: true,
-  path: "/",
   sameSite: 'None',
-  origin: process.env.CORS_ORIGIN
+  path: '/',
+  domain: 'localhost'
 };
 
 const homepage = (req, res) => {
